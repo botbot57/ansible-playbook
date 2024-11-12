@@ -1,0 +1,16 @@
+---
+- name: Delete VM on ESXi
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Delete the VM from ESXi
+      community.vmware.vmware_guest:
+        hostname: "192.168.0.118"  
+        username: "root"       
+        password: "Gtelbca@123"   
+        cluster: "vm"  
+        name: "MyNewVM1"  
+        state: absent            
+        validate_certs: no      
+      delegate_to: localhost
+

@@ -1,0 +1,7 @@
+---
+vcenter_hostname: "vcenter8.bca.local"
+vcenter_datacenter: "Datacenter"
+vcenter_validate_certs: false
+vcenter_username: "administrator@vsphere.local"
+vcenter_password: "Gtelbca@123"
+vm_name: "myvm"
