@@ -1,0 +1,13 @@
+plugin: community.vmware.vmware_vm_inventory
+hostname: "192.168.0.115"
+username: "administrator@vsphere.local"
+password: "Gtelbca@123"
+validate_certs: false  # hoặc true nếu bạn có chứng chỉ SSL hợp lệ
+datacenters:
+  - "Datacenter"
+hostnames:
+- config.name
+#- config.guestId == "rhel7_64Guest"
+#- summary.runtime.powerState == "poweredOn"
+filters:
+- config.guestId == "rhel7_64Guest" or config.guestId == "ubuntu64Guest"
