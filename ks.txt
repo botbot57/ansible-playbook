@@ -1,0 +1,28 @@
+# Khởi động tự động, không cần người dùng tương tác
+install
+cdrom
+lang en_US.UTF-8
+keyboard us
+timezone Asia/Ho_Chi_Minh --isUtc
+rootpw --plaintext Gtelbca@123
+
+# Xóa toàn bộ ổ đĩa và thiết lập phân vùng tự động
+clearpart --all --initlabel
+autopart --type=lvm
+
+# Thiết lập mạng (ví dụ cho IP tĩnh)
+network --bootproto=static --device=eth0 --ip=192.168.1.100 --netmask=255.255.255.0 --gateway=192.168.1.1 --nameserver=8.8.8.8
+# Hoặc nếu sử dụng DHCP
+# network --bootproto=dhcp --device=eth0 --onboot=yes
+
+# Chọn các gói cần thiết
+%packages
+@^minimal
+@core
+kexec-tools
+%end
+
+# Lệnh thực thi sau khi cài đặt
+%post
+echo "Cài đặt hoàn tất"
+%end
