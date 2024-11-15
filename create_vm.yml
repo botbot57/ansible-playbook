@@ -10,12 +10,12 @@
     esxi_password: "Gtelbca@123"                # Mật khẩu ESXi
     datastore_name: "datastore1"             # Datastore để lưu trữ VM
     folder_vm: "vm"
-    vm_name: "MyNewVM"                       # Tên VM mới
+    vm_name: "MyNewVM2"                       # Tên VM mới
     vm_network: "VM Network"                 # Mạng cho VM
     vm_cpu: 2                                # Số lượng CPU
     vm_memory: 4096                          # Dung lượng RAM (MB)
     vm_disk_size: 20                         # Kích thước đĩa cứng (GB)
-    iso_path: "[datastore1] CentOS-7-x86_64-Minimal-2009.iso" # Đường dẫn đến ISO trong datastore
+    iso_path: "[datastore1] iso/genisoimage.iso" # Đường dẫn đến ISO trong datastore
 
   tasks:
     - name: create_VM

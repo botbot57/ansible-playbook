@@ -1,7 +1,31 @@
----
-vcenter_hostname: "vcenter8.bca.local"
-vcenter_datacenter: "Datacenter"
-vcenter_validate_certs: false
-vcenter_username: "administrator@vsphere.local"
-vcenter_password: "Gtelbca@123"
-vm_name: "myvm"
+esxi_hostname: "192.168.0.118"
+esxi_username: "root"
+esxi_password: "Gtelbca@123"
+datastore_name: "datastore1"             # Datastore để lưu trữ VM
+folder_vm: "vm"
+#vm_name: "MyNewVM2"                       # Tên VM mới
+vm_network: "VM Network"                 # Mạng cho VM
+vm_cpu: 2                                # Số lượng CPU
+vm_memory: 4096                          # Dung lượng RAM (MB)
+vm_disk_size: 20                         # Kích thước đĩa cứng (GB)
+iso_path: "[datastore1] iso/genisoimage.iso" # Đường dẫn đến ISO trong datastore
+
+vm_list:
+  - name: "VM1"
+    ip: "192.168.0.120"
+    netmask: "255.255.255.0"
+    gateway: "192.168.0.1"
+    network_adapter: "ens192"
+#    ansible_host: "192.168.0.120"
+  - name: "VM2"
+    ip: "192.168.0.121"
+    netmask: "255.255.255.0"
+    gateway: "192.168.0.1"
+    network_adapter: "ens192"
+#    ansible_host: "192.168.0.121"
+  - name: "VM3"
+    ip: "192.168.0.122"
+    netmask: "255.255.255.0"
+    gateway: "192.168.0.1"
+    network_adapter: "ens192"
+#    ansible_host: "192.168.0.122"

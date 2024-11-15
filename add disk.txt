@@ -1,0 +1,147 @@
+---
+- name: Add new disk to VM on ESXi
+  hosts: localhost
+  gather_facts: no
+  vars:
+    vcenter_hostname: "192.168.0.1"
+    vcenter_username: "administrator@vsphere.local"
+    vcenter_password: "your_password"
+    vm_name: "your_vm_name"
+    disk_size_gb: 20  # Kích thước của disk mới
+  tasks:
+    - name: Add disk to VM
+      community.vmware.vmware_guest_disk:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        name: "{{ vm_name }}"
+        size_gb: "{{ disk_size_gb }}"
+        type: "thick"  # Hoặc "thin" nếu muốn dùng disk mỏng
+        datastore: "datastore_name"  # Tên của datastore
+        state: "present"
+      delegate_to: localhost
+
+
+- name: Extend root filesystem on the VM
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Create physical volume on new disk
+      ansible.builtin.command: pvcreate /dev/sdb
+      become: yes
+
+    - name: Extend volume group
+      ansible.builtin.command: vgextend centos /dev/sdb
+      become: yes
+
+    - name: Extend logical volume
+      ansible.builtin.command: lvextend -l +100%FREE /dev/centos/root
+      become: yes
+
+    - name: Resize filesystem on root partition
+      ansible.builtin.command: resize2fs /dev/centos/root
+      become: yes
+
+vm_list:
+  - name: "VM1"
+    disk_size_gb: 50  # dung lượng disk muốn tăng
+  - name: "VM2"
+    disk_size_gb: 100
+  - name: "VM3"
+    disk_size_gb: 75
+
+---
+- name: Increase disk size for multiple VMs
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vm_disk_vars.yml  # Nạp file biến vào playbook
+
+  tasks:
+    - name: Increase disk size for each VM
+      community.vmware.vmware_guest_disk:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        size_gb: "{{ item.disk_size_gb }}"  # Dung lượng mới của disk
+        state: present
+      loop: "{{ vm_list }}"  # Lặp qua từng VM trong danh sách
+      delegate_to: localhost
+
+
+---
+- name: Increase disk size for multiple VMs
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vm_disk_vars.yml  # Nạp file biến vào playbook
+
+  tasks:
+    - name: Increase disk size for each VM
+      community.vmware.vmware_guest_disk:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        size_gb: "{{ item.disk_size_gb }}"  # Dung lượng mới của disk
+        state: present
+      loop: "{{ vm_list }}"  # Lặp qua từng VM trong danh sách
+      delegate_to: localhost
+
+
+---
+- name: Increase disk size and extend root partition
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+    new_disk_size: 10G  # Điều chỉnh dung lượng mong muốn cho disk mới
+
+  tasks:
+    - name: Identify the new disk device
+      command: "lsblk -ndo NAME,TYPE | grep disk | tail -1"
+      register: new_disk
+      changed_when: false
+      check_mode: no
+      when: ansible_facts['devices']|length > 1
+
+    - name: Create a partition on the new disk
+      parted:
+        device: "/dev/{{ new_disk.stdout }}"
+        number: 1
+        state: present
+        part_type: primary
+      when: ansible_facts['devices']|length > 1
+
+    - name: Create a physical volume on the new partition
+      command: pvcreate "/dev/{{ new_disk.stdout }}1"
+      when: ansible_facts['devices']|length > 1
+
+    - name: Extend the volume group
+      command: vgextend rootvg "/dev/{{ new_disk.stdout }}1"
+      when: ansible_facts['devices']|length > 1
+
+    - name: Extend the logical volume for root
+      command: lvextend -l +100%FREE /dev/rootvg/rootlv
+      when: ansible_facts['devices']|length > 1
+
+    - name: Resize the filesystem on root
+      filesystem:
+        fstype: ext4
+        dev: /dev/rootvg/rootlv
+        resizefs: yes
+      when: ansible_facts['devices']|length > 1
+[all]
+vm1 ansible_host=192.168.0.101
+vm2 ansible_host=192.168.0.102
+vm3 ansible_host=192.168.0.103
+
+[all:vars]
+ansible_user=root
+ansible_password=your_password
+ansible_become=yes

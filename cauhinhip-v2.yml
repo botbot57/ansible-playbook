@@ -1,0 +1,17 @@
+- name: Configure static IP on VM using vSphere API
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Set static IP for the VM
+      community.vmware.vmware_guest:
+        hostname: "192.168.0.118"
+        username: "root"
+        password: "Gtelbca@123"
+        validate_certs: no
+        name: "VM1"
+        networks:
+          - name: "VM Network"
+            ip: "192.168.0.120"
+            netmask: "255.255.255.0"
+            gateway: "192.168.0.1"
+      delegate_to: localhost

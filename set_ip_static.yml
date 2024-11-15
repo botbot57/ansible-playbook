@@ -1,0 +1,44 @@
+---
+- name: Configure static IP on VM using vSphere API
+  hosts: localhost
+  gather_facts: no
+  vars:
+    esxi_host: "192.168.0.118"
+    esxi_user: "root"
+    esxi_password: "Gtelbca@123"
+    vm_name: "MyNewVM1"
+    datastore_name: "datastore1"
+    vm_folder: "vm"
+#    guest_id: "Other (64-bit)"
+    vm_network_name: "VM Network"
+    vm_cpu: 2                                # Số lượng CPU
+    vm_memory: 4096                          # Dung lượng RAM (MB)
+    vm_disk_size: 20                         # Kích thước đĩa cứng (GB)
+    static_ip: "192.168.0.100"
+    netmask: "255.255.255.0"
+    gateway: "192.168.0.1"
+  tasks:
+    - name: Set static IP for the VM
+      community.vmware.vmware_guest:
+        hostname: "{{ esxi_host }}"
+        username: "{{ esxi_user }}"
+        password: "{{ esxi_password }}"
+#        datastore: "{{ datastore }}"
+        validate_certs: no
+        folder: "{{ vm_folder }}"
+#        guest_id: "{{ guest_id }}"
+        name: "{{ vm_name }}"
+        disk:
+          - size_gb: "{{ vm_disk_size }}"
+            type: thin
+            datastore: "{{ datastore_name }}"
+        hardware:
+          memory_mb: "{{ vm_memory }}"
+          num_cpus: "{{ vm_cpu }}"
+
+        networks:
+          - name: "{{ vm_network_name }}"
+            ip: "{{ static_ip }}"
+            netmask: "{{ netmask }}"
+            gateway: "{{ gateway }}"
+

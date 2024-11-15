@@ -1,0 +1,22 @@
+---
+- name: Configure static IPs for multiple VMs on ESXi
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: cau hinh ip
+        community.vmware.vmware_vm_shell:
+          hostname: "{{ esxi_hostname }}"
+          username: "{{ esxi_username }}"
+          password: "{{ esxi_password }}"
+          validate_certs: no
+          vm_id: "{{ item.name }}"
+          vm_shell: |
+            nmcli con mod ens192 ipv4.addresses {{ item.ip }}/24
+            nmcli con mod ens192 ipv4.gateway {{ item.gateway }}
+            nmcli con mod ens192 ipv4.dns 8.8.8.8
+            nmcli con mod ens192 ipv4.method manual
+            nmcli con up ens192
+          wait_for_exit: true
+        loop: "{{ vm_list }}"

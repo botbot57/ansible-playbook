@@ -8,8 +8,9 @@
         hostname: "192.168.0.118"  
         username: "root"       
         password: "Gtelbca@123"   
-        cluster: "vm"  
-        name: "MyNewVM1"  
+        cluster: "vm"
+        state: powered-off
+        name: "MyNewVM2"  
         state: absent            
         validate_certs: no      
       delegate_to: localhost

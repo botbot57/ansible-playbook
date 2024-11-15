@@ -1,0 +1,22 @@
+# configure_ips.yml
+---
+- name: Thiết lập IP tĩnh cho VM
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Cấu hình IP tĩnh cho VM
+      community.vmware.vmware_guest:
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        networks:
+          - name: "VM Network"
+            ip: "{{ item.ip }}"
+            netmask: "{{ item.netmask }}"
+            gateway: "{{ item.gateway }}"
+      loop: "{{ vm_list }}"
+

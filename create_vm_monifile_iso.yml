@@ -15,7 +15,7 @@
     vm_cpu: 2                                # Số lượng CPU
     vm_memory: 4096                          # Dung lượng RAM (MB)
     vm_disk_size: 20                         # Kích thước đĩa cứng (GB)
-    iso_path: "[datastore1] modified_centos.iso" # Đường dẫn đến ISO trong datastore
+    iso_path: "[datastore1] centos7.iso" # Đường dẫn đến ISO trong datastore
 
   tasks:
     - name: create_VM
@@ -37,6 +37,10 @@
           num_cpus: "{{ vm_cpu }}"
         networks:
           - name: "{{ vm_network }}"
+            type: static
+            ip: "192.168.0.100"
+            netmask: "255.255.255.0"
+            gateway: "192.168.0.1"
         cdrom:
           -  type: "iso"
              iso_path: "{{ iso_path }}"

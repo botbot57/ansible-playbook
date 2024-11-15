@@ -1,0 +1,25 @@
+---
+- name: Configure static IPs for multiple VMs on ESXi
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Configure IP using VMware Tools
+      community.vmware.vmware_vm_shell:
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+        vm_username: "root"
+        vm_password: "Gtelbca@123"
+        validate_certs: no
+        vm_id: "{{ item.name }}"
+        vm_shell: |
+          nmcli con mod {{ item.network_adapter }} ipv4.addresses {{ item.ip }}/24
+          nmcli con mod {{ item.network_adapter }} ipv4.gateway {{ item.gateway }}
+          nmcli con mod {{ item.network_adapter }} ipv4.dns 8.8.8.8
+          nmcli con mod {{ item.network_adapter }} ipv4.method manual
+          nmcli con up {{ item.network_adapter }}
+        wait_for_exit: true
+      loop: "{{ vm_list }}"
+
