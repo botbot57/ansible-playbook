@@ -1,0 +1,24 @@
+- name: Increase disk size for VM on ESXi
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Increase disk size for the VM
+      community.vmware.vmware_guest_disk:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ datacenter_name }}"
+        name: "{{ item.name }}"
+        disk:
+          - size_gb: "{{ new_disk_size }}"  # Dung lượng đĩa mới (GB)
+            type: "thin"  # Loại đĩa (thin hoặc eagerzeroedthick)
+            datastore: "{{ datastore_name }}"  # Datastore chứa đĩa
+            controller_number: 0  # ID của bộ điều khiển SCSI (thường là 0 cho đĩa đầu tiên)
+            unit_number: 1  # Đĩa thứ tự 1 (thường là đĩa thứ hai)
+#        state: present  # Tăng dung lượng đĩa
+      delegate_to: localhost
+      loop: "{{ vm_list }}"
+

@@ -1,0 +1,17 @@
+---
+- name: Power on VMware virtual machines
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Power on VM
+      community.vmware.vmware_guest_powerstate:
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        state: powered-off
+      loop: "{{ vm_list }}"  # Lặp qua từng VM trong danh sách
+      delegate_to: localhost

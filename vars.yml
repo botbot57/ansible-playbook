@@ -1,31 +1,53 @@
+vcenter_hostname: "192.168.0.115"
+vcenter_username: "administrator@vsphere.local"
+vcenter_password: "Gtelbca@123"
 esxi_hostname: "192.168.0.118"
 esxi_username: "root"
 esxi_password: "Gtelbca@123"
-datastore_name: "datastore1"             # Datastore để lưu trữ VM
+datastore_name: "datastore1"
+datacenter_name: "Datacenter"
+esxi1: "192.168.0.118"
 folder_vm: "vm"
+new_disk_size: 5
 #vm_name: "MyNewVM2"                       # Tên VM mới
 vm_network: "VM Network"                 # Mạng cho VM
 vm_cpu: 2                                # Số lượng CPU
 vm_memory: 4096                          # Dung lượng RAM (MB)
 vm_disk_size: 20                         # Kích thước đĩa cứng (GB)
 iso_path: "[datastore1] iso/genisoimage.iso" # Đường dẫn đến ISO trong datastore
-
+vm_username: "root"
+vm_password: "Gtelbca@123"
+vm_clone: "VM1"
 vm_list:
   - name: "VM1"
     ip: "192.168.0.120"
     netmask: "255.255.255.0"
     gateway: "192.168.0.1"
-    network_adapter: "ens192"
-#    ansible_host: "192.168.0.120"
+    network_adapter: "vmxnet3"
+    ansible_host: "192.168.0.120"
+    num_cpus: "4"
+    memory_mb: "4096"
   - name: "VM2"
     ip: "192.168.0.121"
     netmask: "255.255.255.0"
     gateway: "192.168.0.1"
-    network_adapter: "ens192"
-#    ansible_host: "192.168.0.121"
+    num_cpus: "4"
+    memory_mb: "4096"
+    network_adapter: "vmxnet3"
+    ansible_host: "192.168.0.121"
   - name: "VM3"
     ip: "192.168.0.122"
+    memory_mb: "4096"
+    num_cpus: "5"
     netmask: "255.255.255.0"
     gateway: "192.168.0.1"
-    network_adapter: "ens192"
-#    ansible_host: "192.168.0.122"
+    network_adapter: "e1000e"
+    ansible_host: "192.168.0.122"
+  - name: "VM4"
+    ip: "192.168.0.125"
+    netmask: "255.255.255.0"
+    num_cpus: "3"
+    memory_mb: "4096"
+    gateway: "192.168.0.1"
+    network_adapter: "vmxnet3"
+

@@ -1,11 +1,11 @@
 ---
-- name: delete vm on esxi
+- name: powered-off vm on esxi
   hosts: localhost
   gather_facts: no
   vars_files:
     - vars.yml
   tasks:
-    - name: deletevm
+    - name: powered-off-vm
       community.vmware.vmware_guest:
         hostname: "{{ esxi_hostname }}"
         username: "{{ esxi_username }}"
@@ -13,7 +13,7 @@
         datastore: "{{ datastore_name }}"
         validate_certs: false
         name: "VM1"
-        state: absent
+        state: powered-off
       delegate_to: localhost
 
 

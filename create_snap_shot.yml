@@ -1,0 +1,20 @@
+---
+- name: Snapshot VMware virtual machines
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: create_snapshot_vm
+      community.vmware.vmware_guest_snapshot:
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+	datacenter: "{{ datacenter_name }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        state: present
+        snapshot_name: snap1
+        description: snap1_description
+      loop: "{{ vm_list }}"  # Lặp qua từng VM trong danh sách
+      delegate_to: localhost

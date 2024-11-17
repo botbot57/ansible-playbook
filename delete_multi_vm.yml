@@ -1,0 +1,17 @@
+---
+- name: Delete VMware virtual machines
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Delete on VM
+      community.vmware.vmware_guest:
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        state: absent
+      loop: "{{ vm_list }}"  # Lặp qua từng VM trong danh sách
+      delegate_to: localhost

@@ -24,6 +24,12 @@
           num_cpus: "{{ vm_cpu }}"
         networks:
           - name: "{{ vm_network }}"
+            ip: "{{ item.ip }}"
+            netmask: "{{ item.netmask }}"
+            gataway: "{{ item.gateway }}"
+            device_type: "{{ item.network_adapter }}"
+        wait_for_ip_address: true
+        wait_for_ip_address_timeout: 600
         cdrom:
           -  type: "iso"
              iso_path: "{{ iso_path }}"

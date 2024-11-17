@@ -1,0 +1,21 @@
+---
+- name: clone_instant_vm
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: clone_vm
+      community.vmware.vmware_guest_instant_clone:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: false
+        folder: "{{ folder_vm }}"
+        datastore: "{{ datastore_name }}"
+        datacenter: "{{ datacenter_name }}"
+        host: "{{ esxi1 }}"
+        name: "vm1-clone"
+        parent_vm: "VM1"
+      register: vm_clone
+      delegate_to: localhost
