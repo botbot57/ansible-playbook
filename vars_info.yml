@@ -1,0 +1,23 @@
+# Thông tin về vCenter và ESXi host
+vcenter_hostname: "192.168.0.115"
+vcenter_username: "administrator@vsphere.local"
+vcenter_password: "Gtelbca@123"
+esxi1: "192.168.0.118"
+datastore_name: "datastore1"
+datacenter_name: "Datacenter"
+folder_vm: "vm"
+
+# Thông tin liên quan đến máy ảo
+vm_username: "root"
+vm_password: "Gtelbca@123"
+
+# Cấu hình thông tin tùy chỉnh cho các máy ảo được clone
+guestinfo:
+  ic:
+    hostname: "vm-clone-01"       # Tên hostname của VM
+    ipaddress: "192.168.1.100"    # Địa chỉ IP tĩnh của VM
+    netmask: "255.255.255.0"      # Subnet mask
+    gateway: "192.168.1.1"        # Gateway
+    dns: "8.8.8.8"                # Địa chỉ DNS
+    domain: "example.com"         # Domain name
+

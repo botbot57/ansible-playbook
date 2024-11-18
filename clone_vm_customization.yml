@@ -1,0 +1,34 @@
+---
+- name: Clone VM with customization
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Instant Clone a VM with guest customization
+      community.vmware.vmware_guest_instant_clone:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        vm_username: "root"
+        vm_password: "Gtelbca@123"
+        validate_certs: false
+        folder: "{{ folder_vm }}"
+        datastore: "{{ datastore_name }}"
+        datacenter: "{{ datacenter_name }}"
+        host: "192.168.0.118"
+        guestinfo_vars:
+#          hostname: "{{ item.hostname }}"
+          - ipaddress: "{{ guestinfo.ic..ip }}"
+            netmask: "{{ guestinfo.ic.netmask }}"
+            gateway: "{{ guestinfo.ic.gateway }}"
+            dns: "{{ guestinfo.ic.dns }}"
+#          domain: "{{ item.domain }}"
+        name: "{{ item.name }}"
+        parent_vm: "VM1"
+#        power_on: true
+      loop: "{{ vm_list }}"
+      register: instant_cloned_vms
+      delegate_to: localhost
+
