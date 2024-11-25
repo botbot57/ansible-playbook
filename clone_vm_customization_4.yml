@@ -1,0 +1,31 @@
+- name: Clone multiple VMs and configure IPs
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml  # File chứa danh sách các VM và cấu hình cần thiết
+  tasks:
+    - name: Clone VM
+      community.vmware.vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ datacenter_name }}"
+        folder: "{{ folder_vm }}"
+        state: poweredon
+        resource_pool: "{{ resource_pool }}"  # Đảm bảo pool hợp lệ
+        name: "{{ item.name }}"  # Tên VM
+        template: "{{ vm_template }}"  # Template VM gốc
+        hardware:
+          memory_mb: "{{ item.memory_mb }}"  # Dung lượng RAM
+          num_cpus: "{{ item.num_cpus }}"  # Số lượng CPU
+        networks:
+          - name: "{{ item.network }}"  # Tên mạng
+            ip: "{{ item.ip }}"  # Địa chỉ IP
+            netmask: "{{ item.netmask }}"  # Subnet mask
+            gateway: "{{ item.gateway }}"  # Gateway
+        wait_for_ip_address: yes  # Chờ lấy được IP
+      loop: "{{ vm_list }}"  # Lặp qua danh sách VM
+      loop_control:
+        label: "{{ item.name }}"  # Hiển thị tên VM khi lặp
+

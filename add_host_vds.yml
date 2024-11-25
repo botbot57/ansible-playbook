@@ -1,0 +1,21 @@
+- name: Create vSphere Distributed Switch (VDS) and add hosts
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Add ESXi hosts to vSphere Distributed Switch (VDS)
+      community.vmware.vmware_dvs_host:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+#        datacenter: "{{ datacenter_name }}"
+        switch_name: "my_dvswitch"
+        esxi_hostname: '{{ esxi1 }}'
+      register: add_hosts_result
+
+    - name: Display hosts added to vDS
+      debug:
+        var: add_hosts_result
+

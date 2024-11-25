@@ -1,0 +1,19 @@
+- name: Check existing vDS
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Get vDS information
+      community.vmware.vmware_dvswitch_info:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+#        datacenter: "{{ datacenter_name }}"
+      register: dvswitch_info
+
+    - name: Display vDS information
+      debug:
+        var: dvswitch_info
+

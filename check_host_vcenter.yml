@@ -1,0 +1,19 @@
+- name: Get all ESXi hosts information from vCenter
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Retrieve all ESXi hosts information
+      community.vmware.vmware_host_facts:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        esxi_hostname: "{{ esxi1 }}"
+      register: esxi_hosts_info
+
+    - name: Display collected ESXi hosts information
+      debug:
+        var: esxi_hosts_info
+

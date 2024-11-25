@@ -1,0 +1,29 @@
+- name: Clone VM and configure IP
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Clone VM
+      community.vmware.vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ datacenter_name }}"
+        folder: "{{ folder_vm }}"
+        state: poweredon
+#        resource_pool: "/Datacenter/New Cluster/192.168.0.118/New Resource Pool/"
+        resource_pool: "New Resource Pool" 
+        name: vm-clone6
+        template: vm-clone5
+        hardware:
+          memory_mb: 2048
+          num_cpus: 2
+        networks:
+          - name: VM Network
+            ip: 192.168.0.123
+            netmask: 255.255.255.0
+            gateway: 192.168.0.1
+        wait_for_ip_address: yes
+
