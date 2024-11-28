@@ -1,0 +1,31 @@
+---
+- name: Manage datastores on multiple ESXi hosts
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml  # Chứa danh sách ESXi hosts và các thông số liên quan
+    - var_host.yml
+  tasks:
+    - name: Gather datastore information for each ESXi host
+      community.vmware.vmware_datastore_info:
+        hostname: "{{ item.ip }}"
+        username: "{{ item.esxi_username }}"
+        password: "{{ item.esxi_password }}"
+        validate_certs: no
+#        esxi_hostname: "{{ item.ip }}"
+      register: datastore_info
+      loop: "{{ host_esxi }}"
+      loop_control:
+        label: "{{ item }}"
+
+    - name: Rename datastore if needed
+      community.vmware.vmware_datastore:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datastore_name: "{{ item.datastore_name }}"
+        new_datastore_name: "{{ item.new_datastore_name }}"
+      loop: "{{ datastore_info.results | map(attribute='datastores') | sum(start=[]) | map('extract', 'info') }}"
+      when: item.datastore_name is defined and item.datastore_name != item.new_datastore_name
+

@@ -1,0 +1,19 @@
+---
+- name: Check datastore usage and create VM on datastore with the lowest usage
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - var_host.yml
+  tasks:
+    - name: Gather datastore information
+      community.vmware.vmware_datastore_info:
+        hostname: "{{ item.ip }}"
+        username: "{{ item.esxi_username }}"
+        password: "{{ item.esxi_password }}"
+        validate_certs: false
+      register: datastore_info
+      loop: "{{ host_esxi }}"
+    - name: Display datastore information
+      debug:
+        var: datastore_info.datastores
+      loop: "{{ host_esxi }}"

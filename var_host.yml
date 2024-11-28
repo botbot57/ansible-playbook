@@ -1,0 +1,4 @@
+host_esxi:
+  - ip: 10.2.220.112
+    esxi_username: "root"
+    esxi_password: "Admin@123"
