@@ -1,0 +1,40 @@
+---
+- name: Configure DNS server
+  hosts: vm_group
+  become: true
+  tasks:
+    - name: Install BIND
+      yum:
+        name: bind
+        state: present
+
+    - name: Add zone configuration to named.conf
+      blockinfile:
+        path: /etc/named.conf
+        block: |
+          zone "example.com" {
+              type master;
+              file "/var/named/db.example.com";
+          };
+
+    - name: Create zone file
+      copy:
+        dest: /var/named/db.example.com
+        content: |
+          $TTL 86400
+          @   IN  SOA ns.example.com. admin.example.com. (
+              2023120301 ; Serial
+              3600       ; Refresh
+              1800       ; Retry
+              1209600    ; Expire
+              86400 )    ; Minimum TTL
+          @   IN  NS ns.example.com.
+          ns  IN  A  192.168.1.1
+          www IN  A  192.168.1.2
+
+    - name: Ensure BIND service is running
+      service:
+        name: named
+        state: started
+        enabled: true
+
