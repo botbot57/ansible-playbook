@@ -1,0 +1,35 @@
+- name: Clone multiple VMs with continuous datastore space check
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yml
+    - var_host.yml
+
+  tasks:
+    - name: Gather datastore information
+      community.vmware.vmware_datastore_info:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: false
+        cluster: "VHHT"
+      register: datastore_info
+
+    - name: Display datastore information
+      debug:
+        var: datastore_info.datastores
+
+    - name: Find the datastore with the lowest usage
+      set_fact:
+        selected_datastore: "{{ datastore_info.datastores | sort(attribute='freeSpace', reverse=true) | first }}"
+
+    - name: Display selected datastore information
+      debug:
+        msg: "Initially selected datastore is {{ selected_datastore.name }} with {{ selected_datastore.freeSpace | human_readable }} free space."
+
+    - name: Clone each VM with datastore space check
+      include_tasks: clone_vm_block.yml
+      loop: "{{ vm_list }}"
+      loop_control:
+        label: "{{ item.name }}"
+

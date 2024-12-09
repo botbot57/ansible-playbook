@@ -1,0 +1,68 @@
+- name: Clone multiple VMs and configure IPs
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - var.yml  # File chứa danh sách các VM và cấu hình cần thiết
+
+  serial: 3  # Chỉ clone tối đa 3 VM đồng thời trong mỗi vòng lặp
+
+  tasks:
+    # 1. Clone multiple VMs concurrently with limited parallelism
+    - name: Clone VMs
+      community.vmware.vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ datacenter_name }}"
+        folder: "{{ folder_vm }}"
+        state: poweredon
+        name: "{{ item.name }}"
+        template: "redhat89"
+        networks:
+          - name: "{{ item.network }}"
+            ip: "{{ item.ip }}"
+            netmask: "{{ item.netmask }}"
+            gateway: "{{ item.gateway }}"
+        wait_for_ip_address: no  # Không chờ IP, chỉ tạo VM
+      async: 600
+      poll: 0
+      loop: "{{ vm_list }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: vm_clone_jobs
+
+    # 2. Wait for all cloning jobs to finish
+    - name: Wait for VM cloning to finish
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: vm_clone_results
+      until: vm_clone_results.finished
+      retries: 60
+      delay: 10
+      loop: "{{ vm_clone_jobs.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      ignore_errors: yes
+
+    # 3. Configure IPs concurrently
+    - name: Configure IPs on VMs
+      community.vmware.vmware_guest_network:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        datacenter: "{{ datacenter_name }}"
+        networks:
+          - name: "{{ item.network }}"
+            ip: "{{ item.ip }}"
+            netmask: "{{ item.netmask }}"
+            gateway: "{{ item.gateway }}"
+      loop: "{{ vm_list }}"
+      loop_control:
+        label: "{{ item.name }}"
+      async: 600
+      poll: 0
+      register: ip_configure_jobs
+

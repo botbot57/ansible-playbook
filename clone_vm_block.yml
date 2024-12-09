@@ -1,0 +1,46 @@
+- block:
+    - name: Refresh datastore information before cloning
+      community.vmware.vmware_datastore_info:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: false
+        cluster: "VHHT"
+      register: updated_datastore_info
+
+    - name: Update selected datastore
+      set_fact:
+        selected_datastore: "{{ updated_datastore_info.datastores | selectattr('name', 'equalto', selected_datastore.name) | first }}"
+
+    - name: Check if datastore has enough free space
+      fail:
+        msg: "Not enough free space on datastore {{ selected_datastore.name }}. It has {{ selected_datastore.freeSpace | human_readable }} free, but at least {{ min_free_space | human_readable }} is required."
+      when: selected_datastore.freeSpace < 10737418240
+
+    - name: Clone VM
+      community.vmware.vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ datacenter_name }}"
+        folder: "{{ folder_vm }}"
+        state: poweredon
+#        resource_pool: "{{ resource_pool }}"
+        name: "{{ item.name }}"
+        template: "redhat89"
+        hardware:
+          memory_mb: "{{ item.memory_mb }}"
+          num_cpus: "{{ item.num_cpus }}"
+        datastore: "{{ selected_datastore.name }}"
+        networks:
+          - name: "{{ item.network }}"
+            ip: "{{ item.ip }}"
+            netmask: "{{ item.netmask }}"
+            gateway: "{{ item.gateway }}"
+        wait_for_ip_address: yes
+  rescue:
+    - name: Log VM creation failure
+      debug:
+        msg: "Skipping creation of VM {{ item.name }} due to insufficient datastore space."
+
